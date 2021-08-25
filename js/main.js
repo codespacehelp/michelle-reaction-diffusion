@@ -7,7 +7,10 @@ import ImageLayer from "./layers/image.js";
 import ReactionDiffusionLayer from "./layers/reaction-diffusion.js";
 import WebcamLayer from "./layers/webcam.js";
 import MirrorLayer from "./layers/mirror.js";
+<<<<<<< HEAD
 import HistoryLayer from "./layers/history.js";
+=======
+>>>>>>> 7384af200f561569ef37dcd3e91fe459c40cbd0a
 
 let canvas, camera, renderer, layers, mesh, material;
 
