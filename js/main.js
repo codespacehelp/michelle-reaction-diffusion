@@ -119,7 +119,7 @@ function switchScene() {
   const timeline = gsap.timeline();
   timeline.to(oldColorMapLayer.material.uniforms.uOpacity, {
     value: 0,
-    duration: 30,
+    duration: 3,
   });
   timeline.add(() => {
     console.log("switch");
@@ -128,7 +128,7 @@ function switchScene() {
   timeline.set(newColorMapLayer.material.uniforms.uOpacity, { value: 0 });
   timeline.to(newColorMapLayer.material.uniforms.uOpacity, {
     value: 1,
-    duration: 30,
+    duration: 3,
   });
 }
 

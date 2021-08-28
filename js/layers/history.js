@@ -47,14 +47,14 @@ export default class HistoryLayer {
     this.mesh = new THREE.Mesh(geometry, this.material);
 
     this.historyTargets = [];
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 20; i++) {
       const target = new THREE.WebGLRenderTarget(width, height, {
         depthBuffer: false,
       });
       this.historyTargets.push(target);
     }
     this.headIndex = 0;
-    this.tailIndex = 150;
+    this.tailIndex = 10;
 
     this.outputTarget = new THREE.WebGLRenderTarget(width, height, {
       depthBuffer: false,
