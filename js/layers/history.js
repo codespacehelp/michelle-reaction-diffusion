@@ -47,17 +47,19 @@ export default class HistoryLayer {
     this.mesh = new THREE.Mesh(geometry, this.material);
 
     this.historyTargets = [];
-    for (let i = 0; i < 120; i++) {
-      const target =  new THREE.WebGLRenderTarget(width, height, { depthBuffer: false });
+    for (let i = 0; i < 300; i++) {
+      const target = new THREE.WebGLRenderTarget(width, height, {
+        depthBuffer: false,
+      });
       this.historyTargets.push(target);
     }
     this.headIndex = 0;
-    this.tailIndex = 60;
+    this.tailIndex = 150;
 
-    this.outputTarget = new THREE.WebGLRenderTarget(width, height, { depthBuffer: false });
+    this.outputTarget = new THREE.WebGLRenderTarget(width, height, {
+      depthBuffer: false,
+    });
   }
-
-
 
   draw(renderer, camera, elapsedTime, prevLayer) {
     // Copy the output of the input layer to the most recent history texture
@@ -68,7 +70,9 @@ export default class HistoryLayer {
     renderer.setRenderTarget(null);
 
     this.mesh.material = this.copyMaterial;
-    this.copyMaterial.uniforms.uTexture.value = randomChoice(this.historyTargets).texture;
+    this.copyMaterial.uniforms.uTexture.value = randomChoice(
+      this.historyTargets
+    ).texture;
     // this.copyMaterial.uniforms.uTexture.value = this.historyTargets[this.tailIndex].texture;
     renderer.setRenderTarget(this.outputTarget);
     renderer.render(this.mesh, camera);
@@ -80,10 +84,10 @@ export default class HistoryLayer {
       this.headIndex = 0;
     }
 
-    const diceRoll = Math.random()
-    if (diceRoll > 0.5) {
+    const diceRoll = Math.random();
+    if (diceRoll > 0.8) {
       this.tailIndex++;
-    } else if (diceRoll < 0.4) {
+    } else if (diceRoll < 0.7) {
       this.tailIndex--;
     }
     if (this.tailIndex >= this.historyTargets.length) {
@@ -91,7 +95,5 @@ export default class HistoryLayer {
     } else if (this.tailIndex < 0) {
       this.tailIndex = this.historyTargets.length - 1;
     }
-
   }
-  
 }

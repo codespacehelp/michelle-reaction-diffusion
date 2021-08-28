@@ -9,7 +9,49 @@ import WebcamLayer from "./layers/webcam.js";
 import MirrorLayer from "./layers/mirror.js";
 import HistoryLayer from "./layers/history.js";
 
-let canvas, camera, renderer, layers, mesh, material;
+let canvas, camera, renderer, mesh, material, scenes, activeSceneIndex;
+
+async function createScene1(width, height) {
+  const colorMapLayer = new ColorMapLayer("./img/Black-W.png");
+  const historyLayer = new HistoryLayer();
+  const webcamLayer = new WebcamLayer();
+  const differenceLayer = new DifferenceLayer();
+  const mirrorLayer = new MirrorLayer();
+
+  const layers = [
+    webcamLayer,
+    mirrorLayer,
+    historyLayer,
+    differenceLayer,
+    colorMapLayer,
+  ];
+
+  for (const layer of layers) {
+    await layer.setup(width, height);
+  }
+  return {
+    name: "scene1",
+    layers,
+  };
+}
+
+async function createScene2(width, height) {
+  const colorMapLayer = new ColorMapLayer("./img/B.png");
+  const historyLayer = new HistoryLayer();
+  const webcamLayer = new WebcamLayer();
+  const differenceLayer = new DifferenceLayer();
+  const mirrorLayer = new MirrorLayer();
+
+  const layers = [webcamLayer, colorMapLayer];
+
+  for (const layer of layers) {
+    await layer.setup(width, height);
+  }
+  return {
+    name: "scene2",
+    layers,
+  };
+}
 
 async function main() {
   canvas = document.getElementById("c");
@@ -35,30 +77,18 @@ async function main() {
   material = new THREE.MeshBasicMaterial({ color: "white" });
   mesh = new THREE.Mesh(geometry, material);
 
-  const imageLayer = new ImageLayer("./img/sunset.jpg");
-  const colorMapLayer = new ColorMapLayer("./img/B-W.png");
-  const reactionDiffusionLayer = new ReactionDiffusionLayer();
-  const historyLayer = new HistoryLayer();
-  const webcamLayer = new WebcamLayer();
-  const differenceLayer = new DifferenceLayer();
-  const mirrorLayer = new MirrorLayer();
+  // Scenes
+  scenes = [];
+  scenes.push(await createScene1(width, height));
+  scenes.push(await createScene2(width, height));
 
-  // layers = [imageLayer, colorMapLayer];
-  // layers = [webcamLayer, differenceLayer];
-  // layers = [webcamLayer, mirrorLayer, differenceLayer, reactionDiffusionLayer, colorMapLayer];
-  // layers = [webcamLayer, mirrorLayer, differenceLayer, colorMapLayer];
-  layers = [webcamLayer, mirrorLayer, historyLayer, differenceLayer, colorMapLayer];
-  // layers = [imageLayer, reactionDiffusionLayer];
-  // layers = [webcamLayer, colorMapLayer];
-
-  for (const layer of layers) {
-    await layer.setup(width, height);
-  }
+  activeSceneIndex = 0;
 
   requestAnimationFrame(animate);
 }
-
 function animate(elapsedTime) {
+  const activeScene = scenes[activeSceneIndex];
+  const layers = activeScene.layers;
   for (let i = 0; i < layers.length; i++) {
     layers[i].draw(renderer, camera, elapsedTime, layers[i - 1]);
   }
@@ -72,5 +102,40 @@ function animate(elapsedTime) {
   requestAnimationFrame(animate);
 }
 
+function switchScene() {
+  const oldScene = scenes[activeSceneIndex];
+  const oldLayers = oldScene.layers;
+  const oldColorMapLayer = oldLayers[oldLayers.length - 1];
+
+  let newSceneIndex = activeSceneIndex + 1;
+  if (newSceneIndex >= scenes.length) {
+    newSceneIndex = 0;
+  }
+
+  const newScene = scenes[newSceneIndex];
+  const newLayers = newScene.layers;
+  const newColorMapLayer = newLayers[newLayers.length - 1];
+
+  const timeline = gsap.timeline();
+  timeline.to(oldColorMapLayer.material.uniforms.uOpacity, {
+    value: 0,
+    duration: 30,
+  });
+  timeline.add(() => {
+    console.log("switch");
+    activeSceneIndex = newSceneIndex;
+  });
+  timeline.set(newColorMapLayer.material.uniforms.uOpacity, { value: 0 });
+  timeline.to(newColorMapLayer.material.uniforms.uOpacity, {
+    value: 1,
+    duration: 30,
+  });
+}
+
 main();
-// window.addEventListener("click", animate);
+window.addEventListener("dblclick", switchScene);
+window.addEventListener("keydown", (e) => {
+  if (e.key === "E") {
+    switchScene();
+  }
+});
