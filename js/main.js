@@ -12,17 +12,19 @@ import HistoryLayer from "./layers/history.js";
 let canvas, camera, renderer, mesh, material, scenes, activeSceneIndex;
 
 async function createScene1(width, height) {
-  const colorMapLayer = new ColorMapLayer("./img/Black-W.png");
+  const colorMapLayer = new ColorMapLayer("./img/B-R-W.png");
   const historyLayer = new HistoryLayer();
   const webcamLayer = new WebcamLayer();
   const differenceLayer = new DifferenceLayer();
   const mirrorLayer = new MirrorLayer();
+  const reactionDiffusionLayer = new ReactionDiffusionLayer();
 
   const layers = [
     webcamLayer,
     mirrorLayer,
     historyLayer,
     differenceLayer,
+    reactionDiffusionLayer,
     colorMapLayer,
   ];
 
